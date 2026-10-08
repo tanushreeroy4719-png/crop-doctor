@@ -1,0 +1,8 @@
+data/
+model/weights.pt
+model/weights.metrics.json
+report/test_metrics.json
+report/confusion_matrix.png
+__pycache__/
+*.pyc
+.DS_Store
