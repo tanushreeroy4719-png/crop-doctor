@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy — Crop Doctor{% endblock %}
+{% block content %}
+<section class="legal-page">
+  <h2>Privacy Policy</h2>
+  <p>This is placeholder policy text for a demonstration project. Replace it with real copy before taking this app to production.</p>
+  <h2>What we store</h2>
+  <p>Uploaded images are saved to the server's <code>uploads/</code> folder so they can be displayed back to you and referenced in your history log. Questionnaire answers are sent to the report generator and are not stored beyond what appears in your history entry.</p>
+  <h2>Third parties</h2>
+  <p>If an Anthropic API key is configured, image predictions and your questionnaire answers (not the image itself) are sent to Anthropic's API to generate the written report.</p>
+  <h2>Your choices</h2>
+  <p>Delete files from the <code>uploads/</code> folder and clear <code>data/history.json</code> at any time to remove stored data.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+Flask==3.0.3
+gunicorn==22.0.0
+Pillow==10.4.0
+numpy==1.26.4
+tensorflow-cpu==2.16.1
+python-dotenv==1.0.1
+anthropic==0.34.2
+Werkzeug==3.0.3

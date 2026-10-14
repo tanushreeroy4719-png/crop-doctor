@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Page not found — Crop Doctor{% endblock %}
+{% block content %}
+<section style="text-align:center; padding:100px 24px;">
+  <h2>Page not found</h2>
+  <p style="margin:0 auto;">That page doesn't exist. Head back to the home page to run a diagnosis.</p>
+  <a href="{{ url_for('index') }}" class="btn btn-primary" style="margin-top:20px;">Go home</a>
+</section>
+{% endblock %}

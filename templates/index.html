@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Crop Doctor — AI Plant Disease Diagnosis{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">AI-assisted crop diagnostics</div>
+    <h1>Know what's wrong with your plant <em>before</em> it spreads.</h1>
+    <p class="lede">Upload a photo of a leaf, answer a few quick questions about growing conditions, and get an instant first read — plus a plain-language treatment plan.</p>
+    <div class="hero-actions">
+      <a href="#diagnose" class="btn btn-primary">Upload a photo</a>
+      <a href="{{ url_for('user_guide') }}" class="btn btn-ghost">How it works</a>
+    </div>
+  </div>
+  <div class="scan-frame">
+    <span class="corner-tl"></span><span class="corner-br"></span>
+    <div class="scan-frame-content">
+      <svg viewBox="0 0 48 48" width="46" height="46" fill="none"><path d="M24 6c9 6 13.5 13.5 13.5 21A13.5 13.5 0 0 1 10.5 27C10.5 19.5 15 12 24 6Z" fill="currentColor"/></svg>
+      <p style="margin:0;">Diagnostic frame ready<br>Drop a leaf photo to begin</p>
+    </div>
+  </div>
+</section>
+
+<section id="diagnose">
+  <div class="section-head">
+    <h2>Upload a plant image</h2>
+    <p>JPG, PNG, or WEBP. For best results, photograph a single leaf in natural light against a plain background.</p>
+  </div>
+
+  <div class="panel">
+    {% if not model_trained %}
+    <div class="demo-notice" style="display:block; margin-bottom:20px;">
+      No trained model file was found yet, so predictions right now run in <strong>demo mode</strong> (deterministic, but not a real classifier). Run <code>train_model.py</code> against your dataset to enable real predictions — see the User Guide.
+    </div>
+    {% endif %}
+
+    <div id="upload-zone" class="upload-zone">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none"><path d="M12 16V4M12 4 7 9M12 4l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div>Drag & drop your image here, or click to browse</div>
+      <div class="hint">Max 8MB</div>
+      <input type="file" id="file-input" accept=".jpg,.jpeg,.png,.webp">
+    </div>
+
+    <div id="preview-wrap" class="preview-wrap">
+      <img id="preview-img" alt="Selected plant image preview">
+      <div>
+        <button id="analyze-btn" class="btn btn-primary" disabled>Analyze Image</button>
+      </div>
+      <div id="analyze-spinner" class="spinner">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span>Analyzing your image&hellip;</span>
+      </div>
+    </div>
+
+    <div id="error-box" class="error-box"></div>
+
+    <h3 style="margin-top:34px; font-size:1rem; color:var(--text-dim);">Try with sample images</h3>
+    <div class="sample-grid">
+      {% for slug, label in [
+        ('apple_healthy','Apple Healthy'), ('apple_scab','Apple Scab'),
+        ('corn_common_rust','Corn Common Rust'), ('grape_black_rot','Grape Black Rot'),
+        ('potato_healthy','Potato Healthy'), ('potato_late_blight','Potato Late Blight'),
+        ('tomato_healthy','Tomato Healthy'), ('tomato_early_blight','Tomato Early Blight'),
+        ('pepper_bacterial_spot','Pepper Bacterial Spot'), ('strawberry_leaf_scorch','Strawberry Leaf Scorch')
+      ] %}
+      <div class="sample-tile" data-src="{{ url_for('static', filename='images/samples/' ~ slug ~ '.jpg') }}">
+        <img src="{{ url_for('static', filename='images/samples/' ~ slug ~ '.jpg') }}" alt="{{ label }}">
+        <span>{{ label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="hint" style="max-width:60ch; margin-top:10px;">These illustrative tiles stand in for real dataset photos — swap in actual samples from your PlantVillage-style dataset under <code>static/images/samples/</code>.</p>
+
+    <!-- Result -->
+    <div id="result-card" class="result-card">
+      <hr style="border-color:var(--hairline); margin:28px 0;">
+      <h3>🌿 Disease Prediction Result</h3>
+      <div class="result-head">
+        <div>
+          <strong id="result-crop-condition" style="font-size:1.2rem;"></strong>
+          <div id="result-confidence-label" style="color:var(--text-dim); font-size:0.9rem; margin-top:4px;"></div>
+        </div>
+        <span id="result-badge" class="result-badge"></span>
+      </div>
+      <div class="confidence-bar"><div id="confidence-fill" class="confidence-bar-fill" style="width:0%"></div></div>
+      <div id="demo-notice" class="demo-notice" style="display:none;">This result was produced in demo mode (no trained model loaded yet) — it is not a real diagnosis.</div>
+
+      <form id="qform">
+        <div class="qform">
+          <fieldset>
+            <legend>Plant Symptoms</legend>
+            <div class="qgrid">
+              <div class="qfield">
+                <label for="leaf_discoloration">Leaf discoloration observed?</label>
+                <select name="leaf_discoloration" id="leaf_discoloration">
+                  <option>Yellowing</option><option>Browning</option><option>Reddening</option><option>Spots</option><option>None</option><option>Other</option>
+                </select>
+              </div>
+              <div class="qfield">
+                <label for="wilting">Wilting or dropping?</label>
+                <select name="wilting" id="wilting">
+                  <option>Wilting</option><option>Dropping</option><option>None</option><option>Slight</option><option>Severe</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Environmental Conditions</legend>
+            <div class="qgrid">
+              <div class="qfield">
+                <label for="weather">Recent weather conditions?</label>
+                <select name="weather" id="weather">
+                  <option>Dry</option><option>Humid</option><option>Rainy</option><option>Normal</option><option>Extreme Heat</option><option>Extreme Cold</option>
+                </select>
+              </div>
+              <div class="qfield">
+                <label for="temperature">Temperature condition?</label>
+                <select name="temperature" id="temperature">
+                  <option>Normal</option><option>Hot</option><option>Cold</option><option>Fluctuating</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Treatment History</legend>
+            <div class="qgrid">
+              <div class="qfield">
+                <label for="fertilizer">Recent fertilizer application?</label>
+                <select name="fertilizer" id="fertilizer">
+                  <option>Yes (NPK)</option><option>Yes (Organic)</option><option>Yes (Other)</option><option>No</option>
+                </select>
+              </div>
+              <div class="qfield">
+                <label for="pesticide">Previous pesticide use?</label>
+                <select name="pesticide" id="pesticide">
+                  <option>Yes (Fungicide)</option><option>Yes (Insecticide)</option><option>Yes (Herbicide)</option><option>No</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Pest Observations</legend>
+            <div class="qgrid">
+              <div class="qfield">
+                <label for="insects">Insects observed?</label>
+                <select name="insects" id="insects">
+                  <option>Aphids</option><option>Whiteflies</option><option>Spider Mites</option><option>Caterpillars</option><option>None</option><option>Other</option>
+                </select>
+              </div>
+              <div class="qfield">
+                <label for="pest_damage">Evidence of pest damage?</label>
+                <select name="pest_damage" id="pest_damage">
+                  <option>Chewing marks</option><option>Holes in leaves</option><option>Sticky residue</option><option>None</option><option>Visible pests</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Plant Management</legend>
+            <div class="qgrid">
+              <div class="qfield">
+                <label for="watering">Watering frequency?</label>
+                <select name="watering" id="watering">
+                  <option>Daily</option><option>Every few days</option><option>Weekly</option><option>Irregular</option><option>Overwatering signs</option><option>Underwatering signs</option>
+                </select>
+              </div>
+              <div class="qfield">
+                <label for="growth_stage">Plant age / growth stage?</label>
+                <select name="growth_stage" id="growth_stage">
+                  <option>Seedling</option><option>Vegetative</option><option>Flowering</option><option>Fruiting</option><option>Mature</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </form>
+
+      <div style="margin-top:20px;">
+        <button id="report-btn" class="btn btn-primary">Get AI Diagnosis</button>
+      </div>
+      <div id="report-spinner" class="spinner">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span>Generating your personalized report&hellip; this can take a moment.</span>
+      </div>
+
+      <div id="report-card" class="report-card">
+        <hr style="border-color:var(--hairline); margin:28px 0;">
+        <h3>AI Agronomist Report</h3>
+        <div id="report-body" class="report-body"></div>
+        <button id="start-over-btn" class="btn btn-ghost" style="margin-top:20px;">Start Over</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

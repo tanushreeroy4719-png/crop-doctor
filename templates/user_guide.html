@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}User Guide — Crop Doctor{% endblock %}
+{% block content %}
+<section>
+  <div class="section-head">
+    <h2>How Crop Doctor works</h2>
+    <p>Four steps from photo to plan.</p>
+  </div>
+
+  <div class="guide-steps">
+    <div class="guide-step">
+      <div class="num">1</div>
+      <div>
+        <h3>Photograph a single leaf</h3>
+        <p>Use natural daylight, a plain background, and fill the frame with one leaf showing the symptom clearly. Avoid heavy shadows or blur.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="num">2</div>
+      <div>
+        <h3>Upload or try a sample</h3>
+        <p>Drag the photo into the upload zone on the Home page, or pick one of the sample tiles to see the flow end to end.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="num">3</div>
+      <div>
+        <h3>Review the prediction</h3>
+        <p>The model returns a crop, a condition, and a confidence score. Lower confidence usually means the photo is unclear or the symptom is ambiguous — try a second angle.</p>
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="num">4</div>
+      <div>
+        <h3>Answer a few questions, get a plan</h3>
+        <p>Short questions about weather, watering, and pest activity let the AI Agronomist tailor its treatment and prevention advice to your actual conditions.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:48px;">
+    <h2>Running this project yourself</h2>
+  </div>
+  <div class="panel">
+    <h3 style="font-size:1rem;">1. Install dependencies</h3>
+    <p><code>pip install -r requirements.txt</code></p>
+    <h3 style="font-size:1rem;">2. Train the model on your dataset</h3>
+    <p>Organize your dataset as <code>data/train/&lt;class_name&gt;/*.jpg</code> and <code>data/val/&lt;class_name&gt;/*.jpg</code> (standard PlantVillage layout), then run <code>python train_model.py</code>. This saves <code>model/crop_doctor_model.keras</code> and <code>model/class_indices.json</code>.</p>
+    <h3 style="font-size:1rem;">3. Run the app</h3>
+    <p><code>python app.py</code>, then open <code>http://localhost:5000</code>. Without a trained model, the app runs in demo mode so you can test the full flow immediately.</p>
+    <h3 style="font-size:1rem;">4. (Optional) Turn on AI reports</h3>
+    <p>Set <code>ANTHROPIC_API_KEY</code> in your <code>.env</code> file to generate reports with Claude instead of the built-in rule-based templates.</p>
+  </div>
+</section>
+{% endblock %}

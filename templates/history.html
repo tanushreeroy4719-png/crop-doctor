@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}History — Crop Doctor{% endblock %}
+{% block content %}
+<section>
+  <div class="section-head">
+    <h2>Diagnosis History</h2>
+    <p>Every report generated on this device is logged here, most recent first.</p>
+  </div>
+
+  {% if entries %}
+  <div class="history-list">
+    {% for e in entries %}
+    <div class="history-row">
+      {% if e.image_url %}<img src="{{ e.image_url }}" alt="">{% else %}<div style="width:56px;height:56px;border-radius:6px;background:var(--bg-raised);"></div>{% endif %}
+      <div class="meta">
+        <strong>{{ e.crop }} — {{ e.condition }}</strong>
+        <span>
+          {{ e.confidence }}% confidence &middot; {{ e.timestamp[:10] }}
+          {%- if e.demo_mode %} &middot; Demo mode{% endif %}
+          &middot;
+          {%- if e.report_excerpt %} {{ 'AI report' if e.used_ai else 'Rule-based report' }}
+          {%- else %} Photo analyzed, no report generated yet{% endif %}
+        </span>
+      </div>
+      <div style="color:var(--text-dim); font-size:0.85rem; max-width:220px;">
+        {% if e.report_excerpt %}{{ e.report_excerpt }}&hellip;{% else %}&mdash;{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state panel">
+    <h3>No diagnoses yet</h3>
+    <p>Run your first analysis from the Home page and it'll show up here.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary" style="margin-top:14px;">Diagnose a plant</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

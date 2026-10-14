@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Tools — Crop Doctor{% endblock %}
+{% block content %}
+<section>
+  <div class="section-head">
+    <h2>Tools</h2>
+    <p>Everything bundled with this build.</p>
+  </div>
+
+  <div class="tool-grid">
+    <div class="tool-card">
+      <h3>Image Diagnosis</h3>
+      <p>Upload a leaf photo for an instant crop and condition prediction with a confidence score.</p>
+      <a href="{{ url_for('index') }}#diagnose" class="btn btn-ghost" style="margin-top:10px;">Open</a>
+    </div>
+    <div class="tool-card">
+      <h3>AI Agronomist Report</h3>
+      <p>Turns the raw prediction plus your questionnaire answers into a plain-language treatment and prevention plan.</p>
+    </div>
+    <div class="tool-card">
+      <h3>Diagnosis History</h3>
+      <p>A running log of every report generated on this device, useful for tracking a plant's condition over time.</p>
+      <a href="{{ url_for('history_page') }}" class="btn btn-ghost" style="margin-top:10px;">Open</a>
+    </div>
+    <div class="tool-card">
+      <h3>Training Script</h3>
+      <p><code>train_model.py</code> fine-tunes a MobileNetV2 backbone on your labeled dataset and saves it for the app to load automatically.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
