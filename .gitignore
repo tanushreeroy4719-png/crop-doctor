@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.pyc
 __pycache__/
 .env
@@ -5,3 +6,13 @@ uploads/*
 !uploads/.gitkeep
 model/*.keras
 venv/
+=======
+data/
+model/weights.pt
+model/weights.metrics.json
+report/test_metrics.json
+report/confusion_matrix.png
+__pycache__/
+*.pyc
+.DS_Store
+>>>>>>> 3e0eea10511e0369da3bf0614ee4e4fb6d8e9e0d
